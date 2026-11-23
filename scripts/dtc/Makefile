@@ -18,7 +18,8 @@ ifeq ($(wildcard /usr/include/yaml.h),)
 HOST_EXTRACFLAGS += -DNO_YAML
 else
 dtc-objs	+= yamltree.o
-HOSTLDLIBS_dtc	:= -lyaml
+# scripts/Makefile.host consumes HOSTLOADLIBES_<program>, not HOSTLDLIBS_<program>.
+HOSTLOADLIBES_dtc	:= -lyaml
 endif
 
 # Generated files need one more search path to include headers in source tree
