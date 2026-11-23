@@ -39,5 +39,5 @@ Samsung Galaxy A03 family (SM-A035F / SM-A035M / SM-A035G), Unisoc UMS9230, qogi
 ## Current status
 
 - Builder: BSP build flags corrected; raw ARM64 kernel build, source-stock boot repackaging, provenance report, kernel-byte verification and release artifact collection are implemented.
-- Kernel: initial HyperBPF source/config audit completed; no feature backports or defconfig behavior changes yet.
+- Kernel: initial HyperBPF audit completed; NET_ACT_BPF and BPF_STREAM_PARSER are enabled in defconfig as the first isolated feature delta. No source backports yet.
 - No build has been launched and no device boot validation has been claimed.
