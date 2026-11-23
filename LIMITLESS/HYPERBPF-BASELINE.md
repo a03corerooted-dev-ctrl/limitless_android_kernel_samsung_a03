@@ -33,10 +33,12 @@ Enabled:
 - CONFIG_NET_SCH_INGRESS=y
 - CONFIG_HAVE_EBPF_JIT=y (selected by ARM64)
 
-Disabled:
-- CONFIG_NET_ACT_BPF — Kconfig depends on NET_CLS_ACT, which is already enabled.
-- CONFIG_BPF_STREAM_PARSER — Kconfig depends on BPF_SYSCALL, which is already enabled.
-- CONFIG_NET_CLS_FLOWER — optional classifier, currently disabled.
+Initial defconfig had these disabled. The first incremental HyperBPF config delta now enables:
+- CONFIG_NET_ACT_BPF=y — its NET_CLS_ACT dependency is enabled.
+- CONFIG_BPF_STREAM_PARSER=y — its BPF_SYSCALL dependency is enabled and it selects STREAM_PARSER.
+
+Still disabled:
+- CONFIG_NET_CLS_FLOWER — optional classifier; deferred until its use case is selected.
 
 ## Gaps and constraints
 
@@ -44,7 +46,7 @@ Disabled:
 - BTF/CO-RE support has not been established. Do not assume CONFIG_DEBUG_INFO_BTF or modern BTF infrastructure exists in this baseline.
 - The exact helper, map-type, program-type, attach-type and verifier feature set still needs a symbol/API inventory against a selected upstream target.
 - Android userspace loader compatibility, permissions, SELinux policy, bpffs mounting and required tooling are separate validation tasks.
-- No BPF feature has been backported as part of this audit.
+- No BPF source code has been backported as part of this audit. The two options above expose implementations already present in this 4.14 tree.
 
 ## Next implementation sequence
 
