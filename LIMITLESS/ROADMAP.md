@@ -4,7 +4,7 @@ This file tracks project-specific work. The inherited kernel tree remains the ba
 
 ## Target
 
-Samsung Galaxy A03 family (SM-A035F / SM-A035M / SM-A035G), Unisoc UMS9230, qogirl6, ARM64. The starting kernel is the upstreamed vendor 4.14 tree. Validate each hardware variant independently even if a common defconfig appears viable.
+Samsung Galaxy A03 family (SM-A035F / SM-A035M / SM-A035G), Unisoc UMS9230, qogirl6, ARM64. The starting kernel is Linux 4.14.199. Validate each hardware variant independently even if a common defconfig appears viable.
 
 ## Workstreams
 
@@ -16,25 +16,28 @@ Samsung Galaxy A03 family (SM-A035F / SM-A035M / SM-A035G), Unisoc UMS9230, qogi
    - Audit compiler compatibility and existing downstream patches.
    - Separate cleanups from functional changes; keep changes bisectable.
 3. **HyperBPF**
-   - Inventory existing BPF core, syscall, verifier, maps, helpers, ARM64 JIT, tracing, perf and cgroup/network hooks.
-   - Map each desired upstream feature to its dependency chain and exact upstream commit range.
+   - Initial source/config inventory is recorded in LIMITLESS/HYPERBPF-BASELINE.md.
+   - Existing 4.14 BPF syscall, verifier, maps/helpers, ARM64 JIT, cgroup, tracing and packet-filter paths are present; this is not modern eBPF feature parity.
+   - Complete the helper/map/program/attach-type inventory and map candidate upstream changes to exact 4.14 dependencies.
    - Backport incrementally with 4.14 API adaptations and focused compile/runtime tests.
    - Evaluate BTF/CO-RE and Android userspace loader compatibility separately; do not claim support until demonstrated.
 4. **Compatibility research**
    - Establish the Android/vendor baseline: VINTF, HAL manifests, init, fstab, SELinux, Binder, properties, linker namespaces and VNDK.
    - Treat GSI boot, OEM ROM support and One UI ports as separate compatibility targets.
 5. **Boot and packaging**
-   - Keep kernel compilation separate from boot/DTBO repacking.
-   - Require tester-provided, matching firmware images and preserve per-device metadata.
-   - Never ship a boot image built from an assumed cross-variant stock image.
+   - Builder now repacks the source tree's Publish/a03-A035FXXS7CXF3.tar.xz stock boot member using the bundled magiskboot, replacing only the kernel payload.
+   - The source archive identifies its stock image as A035FXXS7CXF3. The tester device is A035FXXS9CYG1; cross-binary equivalence is not yet independently verified and the resulting image remains a test artifact until device validation.
+   - Preserve per-device firmware provenance. DTBO packaging and SM-A035M/SM-A035G packaging remain separate work.
 
 ## Release gates
 
-- **Baseline:** repeatable build and artifact validation.
+- **Baseline:** reproducible kernel build and structural validation of raw kernel and repacked boot artifacts.
 - **Alpha:** boots on a specifically identified device/firmware, with logs and known limitations.
 - **Beta:** broader tester coverage and regression checks.
 - **Stable:** only after documented device/firmware matrix and recovery validation.
 
 ## Current status
 
-Planning and repository scaffolding. No kernel feature backports, One UI compatibility work, boot image packaging, or device validation have been completed yet.
+- Builder: BSP build flags corrected; raw ARM64 kernel build, source-stock boot repackaging, provenance report, kernel-byte verification and release artifact collection are implemented.
+- Kernel: initial HyperBPF source/config audit completed; no feature backports or defconfig behavior changes yet.
+- No build has been launched and no device boot validation has been claimed.
