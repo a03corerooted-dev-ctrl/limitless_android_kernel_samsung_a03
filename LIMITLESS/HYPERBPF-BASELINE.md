@@ -33,12 +33,12 @@ Enabled:
 - CONFIG_NET_SCH_INGRESS=y
 - CONFIG_HAVE_EBPF_JIT=y (selected by ARM64)
 
-Initial defconfig had these disabled. The first incremental HyperBPF config delta now enables:
-- CONFIG_NET_ACT_BPF=y — its NET_CLS_ACT dependency is enabled.
-- CONFIG_BPF_STREAM_PARSER=y — its BPF_SYSCALL dependency is enabled and it selects STREAM_PARSER.
+The reproducible boot baseline keeps the stock firmware configuration:
+- CONFIG_NET_ACT_BPF is disabled.
+- CONFIG_BPF_STREAM_PARSER is disabled; CONFIG_STREAM_PARSER therefore remains disabled.
+- CONFIG_NET_CLS_FLOWER remains disabled.
 
-Still disabled:
-- CONFIG_NET_CLS_FLOWER — optional classifier; deferred until its use case is selected.
+These optional features are deferred. They may be enabled later only in a separate, independently testable HyperBPF change after the stock boot baseline and module ABI are validated.
 
 ## Gaps and constraints
 
@@ -50,9 +50,9 @@ Still disabled:
 
 ## Next implementation sequence
 
-1. Produce and retain a reproducible, unmodified baseline build using the corrected builder.
-2. Capture the generated .config and compiler/build metadata.
-3. Enable only already-present optional Kconfig features with satisfied dependencies (starting with NET_ACT_BPF and BPF_STREAM_PARSER) as a separately testable change.
-4. Select an upstream kernel/BPF target and map each candidate commit to 4.14 dependencies before backporting.
-5. Backport in small groups, keeping verifier, helpers/maps, JIT, networking hooks and tracing independently reviewable.
-6. Validate each stage with build tests first, then device/runtime tests. Do not claim CO-RE or modern libbpf compatibility without evidence.
+1. Produce and retain a reproducible stock-config baseline build using the corrected builder.
+2. Capture the generated .config, exact kernel release, Module.symvers and compiler/build metadata.
+3. Compare the complete stock vendor-module ABI against the generated Module.symvers.
+4. Validate boot and hardware initialization on the exact SM-A035F firmware before changing kernel behavior.
+5. Only after baseline validation, enable optional Kconfig features such as NET_ACT_BPF and BPF_STREAM_PARSER in a separate commit.
+6. Select an upstream kernel/BPF target and map each candidate commit to 4.14 dependencies before backporting. Do not claim CO-RE or modern libbpf compatibility without evidence.
