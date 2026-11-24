@@ -10,8 +10,8 @@ Samsung Galaxy A03 family (SM-A035F / SM-A035M / SM-A035G), Unisoc UMS9230, qogi
 
 1. **Baseline and reproducibility**
    - Record source provenance, branch ancestry, defconfig, toolchain versions and build targets.
-   - Build an unmodified baseline before changing kernel behavior.
-   - Compare DTB/DTBO, board config, boot image layout and partition assumptions per variant.
+   - Build an unmodified stock-config baseline before changing kernel behavior.
+   - Compare the embedded stock config, module release/ABI, DTB/DTBO, boot image layout and partition assumptions per variant.
 2. **Kernel maintenance**
    - Audit compiler compatibility and existing downstream patches.
    - Separate cleanups from functional changes; keep changes bisectable.
@@ -26,8 +26,9 @@ Samsung Galaxy A03 family (SM-A035F / SM-A035M / SM-A035G), Unisoc UMS9230, qogi
    - Treat GSI boot, OEM ROM support and One UI ports as separate compatibility targets.
 5. **Boot and packaging**
    - Builder now repacks the source tree's Publish/a03-A035FXXS7CXF3.tar.xz stock boot member using the bundled magiskboot, replacing only the kernel payload.
-   - The source archive identifies its stock image as A035FXXS7CXF3. The tester device is A035FXXS9CYG1; cross-binary equivalence is not yet independently verified and the resulting image remains a test artifact until device validation.
-   - Preserve per-device firmware provenance. DTBO packaging and SM-A035M/SM-A035G packaging remain separate work.
+   - The source archive identifies its stock image as A035FXXS7CXF3; the supplied tester image is A035FXXS9CYG1. Their decompressed ramdisk CPIO and embedded DTB table were compared and are byte-identical. The boot header name and Android patch metadata differ (SRPUH31A007 / 2024-07 versus SRPUH31A009 / 2025-08).
+   - Keep the device's existing CYG1 DTBO partition unchanged for the first boot test. The source builds the qogirl6 DTB/DTBO targets, but this is not a request to flash newly built overlays.
+   - Preserve per-device firmware provenance. SM-A035M/SM-A035G packaging remains separate work.
 
 ## Release gates
 
@@ -38,6 +39,7 @@ Samsung Galaxy A03 family (SM-A035F / SM-A035M / SM-A035G), Unisoc UMS9230, qogi
 
 ## Current status
 
-- Builder: BSP build flags corrected; raw ARM64 kernel build, source-stock boot repackaging, provenance report, kernel-byte verification and release artifact collection are implemented.
-- Kernel: initial HyperBPF audit completed; NET_ACT_BPF and BPF_STREAM_PARSER are enabled in defconfig as the first isolated feature delta. No source backports yet.
-- No build has been launched and no device boot validation has been claimed.
+- Builder: Build #6 compiled Linux 4.14.199 with pinned GCC 4.9 / Clang 11.0.1 and produced a structurally unpackable boot image. It has not been validated by a device boot.
+- Build #6's resolved configuration differed from the supplied CYG1 stock kernel configuration in only four entries: CONFIG_LOCALVERSION, CONFIG_NET_ACT_BPF, CONFIG_BPF_STREAM_PARSER and the selected CONFIG_STREAM_PARSER. The module_layout CRC matched; the complete 580-symbol vendor-module ABI comparison remains pending.
+- Kernel: the defconfig is restored to the stock settings for the first baseline. The DTC host-link fix is retained. No kernel source backports or performance changes are in scope.
+- Current work is limited to the normal boot baseline and compatibility diagnostics. HyperBPF, governors and other optimizations are deferred until boot validation.
